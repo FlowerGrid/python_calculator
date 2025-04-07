@@ -13,6 +13,7 @@ def main():
 
     num1 = IntVar()
     num2 = IntVar()
+    last_press = StringVar()
     operator = StringVar()
 
     # Display
@@ -22,7 +23,7 @@ def main():
 
     # Number buttons
     num_btns = Frame(mainframe)
-    clear_btn = Button(num_btns, text='Clear', command=lambda: clear(num_display, num1, num2, operator))
+    clear_btn = Button(num_btns, text='Clear', command=lambda: clear(num_display, num1, num2, operator, last_press))
     clear_btn.grid(column=1, row=3, columnspan=2)
     num_btns.grid(column=0, row=1, padx=3, pady=2)
     numbers = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0']
@@ -30,7 +31,7 @@ def main():
     column = 0
     col_span = 1
     for i in range(len(numbers)):
-        btn = Button(num_btns, text=numbers[i], command= lambda num=numbers[i]: update_num_display(num, num_display, num1))
+        btn = Button(num_btns, text=numbers[i], command= lambda num=numbers[i]: update_num_display(num, num_display, operator, last_press))
         if column > 2:
             row += 1
             column = 0
@@ -47,40 +48,44 @@ def main():
         # operator = operators[i]
         btn = Button(operators_frame, text=operators[i], 
                      command=lambda selected_operator=operators[i]: operator_pressed(
-                         num1, num2, selected_operator, operator, num_display))
+                         num1, num2, selected_operator, operator, num_display, last_press))
         if column > 1:
             row += 1
             column = 0
         btn.grid(column=column, row=row)
         column += 1
-    equals_btn = Button(operators_frame, text='=', command=lambda: operate(num1, num2, operator, num_display))
+    equals_btn = Button(operators_frame, text='=', command=lambda: equals(num1, num2, operator, num_display, last_press))
     equals_btn.grid(column=0, row=2, columnspan=2)
 
     mainframe.mainloop()
 
 
-def update_num_display(num, num_display, num1):
+def update_num_display(num, num_display, operator, last_press):
+    print(last_press.get())
     current = num_display.get()
-    if current == '0' or num1.get():
+    if current == '0' or operator.get() or last_press.get() == '=':
         current = ''
     num_display.delete(0, END)
     num_display.insert(END, current + num)
+    last_press.set('number')
+    print(last_press.get())
 
 
-def clear(num_display, num1, num2, operator):
+def clear(num_display, num1, num2, operator, last_press):
     num1.set(0)
     num2.set(0)
     operator.set('')
     num_display.delete(0, END)
     num_display.insert(END, '0')
+    last_press.set('clear')
 
 
-def operator_pressed(num1, num2, selected_operator, operator, num_display):
+def operator_pressed(num1, num2, selected_operator, operator, num_display, last_press):
     # If there already is a num 1
     print(f'operator: {operator.get()}')
     print(f'num1 in op_pressed: {num1.get()}')
     if operator.get():
-        operate(num1, num2, operator, num_display)
+        operate(num1, num2, operator, num_display, last_press)
         operator.set(selected_operator)
         print(f'num1 after operate: {num1.get()}')
     else:
@@ -89,9 +94,14 @@ def operator_pressed(num1, num2, selected_operator, operator, num_display):
         operator.set(selected_operator)
         num_display.delete(0, END)
         num_display.insert(END, 0)
+    last_press.set('operator')
 
 
-def operate(num1, num2, operator, num_display):
+def equals(num1, num2, operator, num_display, last_press):
+    operate(num1, num2, operator, num_display, last_press)
+    last_press.set('=')
+
+def operate(num1, num2, operator, num_display, last_press):
     # num1 +-x/ num2 = solution
     # update display with solution
     num2.set(num_display.get())
@@ -104,7 +114,7 @@ def operate(num1, num2, operator, num_display):
     elif operator.get() == '/':
         solution = num1.get() / num2.get()
 
-    clear(num_display, num1, num2, operator)
+    clear(num_display, num1, num2, operator, last_press)
     num1.set(solution)
     print(f'solution: {solution}')
     num_display.delete(0, END)
