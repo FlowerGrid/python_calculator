@@ -4,7 +4,9 @@ from tkinter import ttk
 def main():
     root = Tk()
     root.geometry('325x225')
-    root.attributes('-topmost', True)
+    # root.attributes('-topmost', True)
+    root.lift()
+    root.focus_force()
 
     mainframe = Frame(root, padx=5, pady=5)
     mainframe.pack()
@@ -28,7 +30,7 @@ def main():
     column = 0
     col_span = 1
     for i in range(len(numbers)):
-        btn = Button(num_btns, text=numbers[i], command= lambda num=numbers[i]: update_num_display(num, num_display))
+        btn = Button(num_btns, text=numbers[i], command= lambda num=numbers[i]: update_num_display(num, num_display, num1))
         if column > 2:
             row += 1
             column = 0
@@ -53,15 +55,13 @@ def main():
         column += 1
     equals_btn = Button(operators_frame, text='=', command=lambda: operate(num1, num2, operator, num_display))
     equals_btn.grid(column=0, row=2, columnspan=2)
-    print(operator.get())
-    print(num1.get())
 
     mainframe.mainloop()
 
 
-def update_num_display(num, num_display):
+def update_num_display(num, num_display, num1):
     current = num_display.get()
-    if current == '0':
+    if current == '0' or num1.get():
         current = ''
     num_display.delete(0, END)
     num_display.insert(END, current + num)
@@ -77,9 +77,12 @@ def clear(num_display, num1, num2, operator):
 
 def operator_pressed(num1, num2, selected_operator, operator, num_display):
     # If there already is a num 1
+    print(f'operator: {operator.get()}')
+    print(f'num1 in op_pressed: {num1.get()}')
     if operator.get():
-        num1.set(operate(num1, num2, operator, num_display))
+        operate(num1, num2, operator, num_display)
         operator.set(selected_operator)
+        print(f'num1 after operate: {num1.get()}')
     else:
     # If there's no num1
         num1.set(int(num_display.get()))
@@ -92,7 +95,6 @@ def operate(num1, num2, operator, num_display):
     # num1 +-x/ num2 = solution
     # update display with solution
     num2.set(num_display.get())
-    print(operator.get())
     if operator.get() == '+':
         solution = num1.get() + num2.get()
     elif operator.get() == '-':
@@ -104,8 +106,10 @@ def operate(num1, num2, operator, num_display):
 
     clear(num_display, num1, num2, operator)
     num1.set(solution)
+    print(f'solution: {solution}')
     num_display.delete(0, END)
     num_display.insert(END, solution)
+    print(f'num1 in operate: {num1.get()}')
 
 
 if __name__ == '__main__':
