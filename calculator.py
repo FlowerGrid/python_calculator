@@ -1,3 +1,17 @@
+"""
+TODO:
+1. support decimals
+   - add a decimal button
+2. add more math functions
+   - square
+   - square root
+3. enhance clear button
+   - make 1 press clear the display and a second clear all memory
+4. style
+5. explore class idea offered by chat gpt
+"""
+
+
 from tkinter import *
 from tkinter import ttk
 
@@ -82,9 +96,9 @@ def clear(num_display, num1, num2, operator, last_press):
 
 def operator_pressed(num1, num2, selected_operator, operator, num_display, last_press):
     # If there already is a num 1
-    print(f'operator: {operator.get()}')
-    print(f'num1 in op_pressed: {num1.get()}')
-    if operator.get():
+    if last_press.get() == 'operator':
+        operator.set(selected_operator)
+    elif operator.get():
         operate(num1, num2, operator, num_display, last_press)
         operator.set(selected_operator)
         print(f'num1 after operate: {num1.get()}')
