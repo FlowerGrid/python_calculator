@@ -9,8 +9,8 @@ def main():
     mainframe = Frame(root, padx=5, pady=5)
     mainframe.pack()
 
-    num1 = StringVar()
-    num2 = StringVar()
+    num1 = IntVar()
+    num2 = IntVar()
     operator = StringVar()
 
     # Display
@@ -42,8 +42,10 @@ def main():
     column = 0
     row = 0
     for i in range(len(operators)):
-        operator = operators[i]
-        btn = Button(operators_frame, text=operators[i], command=lambda: operator_pressed(num1, operator, num_display))
+        # operator = operators[i]
+        btn = Button(operators_frame, text=operators[i], 
+                     command=lambda selected_operator=operators[i]: operator_pressed(
+                         num1, num2, selected_operator, operator, num_display))
         if column > 1:
             row += 1
             column = 0
@@ -51,6 +53,8 @@ def main():
         column += 1
     equals_btn = Button(operators_frame, text='=', command=lambda: operate(num1, num2, operator, num_display))
     equals_btn.grid(column=0, row=2, columnspan=2)
+    print(operator.get())
+    print(num1.get())
 
     mainframe.mainloop()
 
@@ -64,26 +68,44 @@ def update_num_display(num, num_display):
 
 
 def clear(num_display, num1, num2, operator):
-    if num_display.get() == 0:
-        num1 = ''
-        num2 = ''
-        operator = ''
+    num1.set(0)
+    num2.set(0)
+    operator.set('')
     num_display.delete(0, END)
     num_display.insert(END, '0')
 
 
-def operator_pressed(num1, operator, num_display):
-    # if no num1, grab the display and store as num1
-    # store the operator
-    # if there is a num1, store display as num2 and perform the operation
-    # store the result as num1 and update the display with num1
-    ...
+def operator_pressed(num1, num2, selected_operator, operator, num_display):
+    # If there already is a num 1
+    if operator.get():
+        num1.set(operate(num1, num2, operator, num_display))
+        operator.set(selected_operator)
+    else:
+    # If there's no num1
+        num1.set(int(num_display.get()))
+        operator.set(selected_operator)
+        num_display.delete(0, END)
+        num_display.insert(END, 0)
 
 
 def operate(num1, num2, operator, num_display):
     # num1 +-x/ num2 = solution
     # update display with solution
-    ...
+    num2.set(num_display.get())
+    print(operator.get())
+    if operator.get() == '+':
+        solution = num1.get() + num2.get()
+    elif operator.get() == '-':
+        solution = num1.get() - num2.get()
+    elif operator.get == 'x':
+        solution = num1.get() * num2.get()
+    elif operator.get() == '/':
+        solution = num1.get() / num2.get()
+
+    clear(num_display, num1, num2, operator)
+    num1.set(solution)
+    num_display.delete(0, END)
+    num_display.insert(END, solution)
 
 
 if __name__ == '__main__':
