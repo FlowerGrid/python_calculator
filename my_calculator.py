@@ -36,8 +36,6 @@ def main():
 
     # Number buttons
     num_btns = Frame(mainframe)
-    clear_btn = Button(num_btns, text='Clear', command=lambda: clear(num_display, num1_var, operator_var, last_press))
-    clear_btn.grid(column=1, row=3, columnspan=2)
     num_btns.grid(column=0, row=1, padx=3, pady=2)
     numbers = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0']
     row = 0
@@ -45,18 +43,24 @@ def main():
     col_span = 1
     for i in range(len(numbers)):
         btn = Button(num_btns, text=numbers[i], relief='raised', command= lambda num=numbers[i]: update_num_display(num, num_display, operator_var, last_press))
+        if numbers[i] == '0':
+            column = 0
+            row = 3
+            col_span = 2
         if column > 2:
             row += 1
             column = 0
         btn.grid(column=column, columnspan=col_span, row=row)
         column += 1
+    decimal_button = Button(num_btns, text=".", command=lambda: update_num_display('.', num_display, operator_var, last_press))
+    decimal_button.grid(column=2, row=3)
 
     # Operator buttons
     operators_frame = Frame(mainframe)
     operators_frame.grid(row=1, column=1, sticky='n', padx=3, pady=2)
     operators = ['+', '-', 'x', '/']
     column = 0
-    row = 0
+    row = 1
     for i in range(len(operators)):
         # operator = operators[i]
         btn = Button(operators_frame, text=operators[i], 
@@ -68,18 +72,36 @@ def main():
         btn.grid(column=column, row=row)
         column += 1
     equals_btn = Button(operators_frame, text='=', command=lambda: equals(num1_var, operator_var, num_display, last_press))
-    equals_btn.grid(column=0, row=2, columnspan=2)
+    equals_btn.grid(column=0, row=3, columnspan=2)
+
+    clear_btn = Button(operators_frame, text='Clear', command=lambda: clear(num_display, num1_var, operator_var, last_press))
+    clear_btn.grid(column=0, row=0, columnspan=2)
 
     mainframe.mainloop()
 
 
 def update_num_display(num, num_display, operator, last_press):
+    # current = num_display.get()
+    # if current == '0' or operator.get() or last_press.get() == '=':
+    #     current = ''
+    # if num == '.':
+    #     if current == '':
+    #         current = '0'
+    # num_display.delete(0, END)
+    # num_display.insert(END, current + num)
+    # last_press.set('number')
+    # print(last_press.get())
+
     current = num_display.get()
-    if current == '0' or operator.get() or last_press.get() == '=':
-        current = ''
-    num_display.delete(0, END)
-    num_display.insert(END, current + num)
+    if current == '0' or last_press.get() == 'operator' or last_press.get() == '=':
+        num_display.delete(0, END)
+    if num == '.' and current == '0':
+        num_display.insert(END, 0)
+
+    
+    num_display.insert(END, num)
     last_press.set('number')
+    print(last_press.get())
 
 
 def clear(num_display, num1_var, operator_var, last_press):
